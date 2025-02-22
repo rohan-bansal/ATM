@@ -72,3 +72,4 @@ class ATMPretrainDataset(BaseDataset):
         tracks, vis = sample_tracks_visible_first(tracks, vis, num_samples=self.num_track_ids)
 
         return vids, tracks, vis, task_emb
+

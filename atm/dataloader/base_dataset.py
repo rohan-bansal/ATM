@@ -120,6 +120,7 @@ class BaseDataset(Dataset):
             vis = demo["root"][v]['vis'][0]  # t, num_tracks
 
             t, c, h, w = vids.shape
+            
 
             last_frame, last_track, last_vis = vids[-1:], tracks[-1:], vis[-1:]
             vids = np.concatenate([vids, np.repeat(last_frame, pad_length, axis=0)], axis=0)
