@@ -1,31 +1,19 @@
 from atm.dataloader import PushTDataset
-import cv2
-import numpy as np
-import matplotlib.pyplot as plt
-import sys
-np.set_printoptions(threshold=sys.maxsize)
+from atm.utils.pusht.pusht_rollout import PushTRolloutPipeline
+from atm.utils.pusht.pusht_env import PushTEnv
 
 if __name__ == "__main__":
     dataset = PushTDataset(
         dataset_dir="/home/terra/dev/Research/rl2/atm/ATM/data/pusht",
     )
-    # images = dataset.get_agentview_images_at_index(0)
-    # image_1 = images["raw"][0]
-    # # image_1 = image_1.astype(np.uint8)
-    # plt.imshow(image_1)
-    # plt.show()
+    
+    env = PushTEnv()
+    demo = 25;
+    
+    rollout_pipeline = PushTRolloutPipeline(env=env, dataloader=dataset, video_path="./tests")
+    
+    reset = dataset.get_state_at_demo(demo)
+    rollout_pipeline.reset_to_state(reset[0])
+    obs, reward, done, info = rollout_pipeline.rollout(dataset.get_actions_at_demo(demo))
+    print(done, info)
 
-    # mask_1 = images["T_mask"][0]
-    # plt.imshow(mask_1)
-    # plt.show()
-
-    # image_1[~mask_1,:] = [0,0,0]
-
-    # plt.imshow(image_1)
-    # plt.show()
-
-    # actions = dataset.get_actions_per_demo(0)
-    # print(actions)
-
-    pixel_to_world = dataset.get_pixel_to_world((24, 48))
-    print(pixel_to_world)

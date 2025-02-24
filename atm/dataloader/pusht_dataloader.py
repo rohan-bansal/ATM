@@ -70,10 +70,10 @@ class PushTDataset(ATMPretrainDataset):
     
     def get_actions_at_index(self, index):
         demo_id = self._index_to_demo_id[index]
-        actions = self.get_actions_per_demo(demo_id)
+        actions = self.get_actions_at_demo(demo_id)
         return actions[index:index + self.sequence_length]
     
-    def get_actions_per_demo(self, demo_idx):
+    def get_actions_at_demo(self, demo_idx):
         demo_pth = self._demo_id_to_path[demo_idx]
         demo = self.load_h5(demo_pth)
 
@@ -81,19 +81,19 @@ class PushTDataset(ATMPretrainDataset):
         
         return actions
     
-    def get_states_at_index(self, index):
+    def get_state_at_index(self, index):
         demo_id = self._index_to_demo_id[index]
-        agent_state, block_xyangle = self.get_states_per_demo(demo_id)
-        return agent_state[index:index + self.sequence_length], block_xyangle[index:index + self.sequence_length]
+        agent_state, block_xyangle = self.get_state_at_demo(demo_id)
+        return np.concatenate([agent_state[index:index + self.sequence_length], block_xyangle[index:index + self.sequence_length]], axis=-1)
     
-    def get_states_per_demo(self, demo_idx):
+    def get_state_at_demo(self, demo_idx):
         demo_pth = self._demo_id_to_path[demo_idx]
         demo = self.load_h5(demo_pth)
 
-        agent_state = demo["root"]["extra_states"]["agent_xy"]
-        block_xyangle = demo["root"]["extra_states"]["block_xy_angle"]
+        agent_state = demo["root"]["extra_states"]["agent_xyz"]
+        block_xyangle = demo["root"]["extra_states"]["block_xyz_angle"]
         
-        return agent_state, block_xyangle
+        return np.concatenate([agent_state, block_xyangle], axis=-1)
 
 
     def __getitem__(self, index):
@@ -117,12 +117,12 @@ class PushTDataset(ATMPretrainDataset):
             mode='edge'
         )
         agent_state = np.pad(
-            demo["root"]["extra_states"]["agent_xy"][time_offset:time_offset + seq_len],
+            demo["root"]["extra_states"]["agent_xyz"][time_offset:time_offset + seq_len],
             ((0, self.sequence_length - seq_len), (0, 0)),
             mode='edge'
         )
         block_xyangle = np.pad(
-            demo["root"]["extra_states"]["block_xy_angle"][time_offset:time_offset + seq_len],
+            demo["root"]["extra_states"]["block_xyz_angle"][time_offset:time_offset + seq_len],
             ((0, self.sequence_length - seq_len), (0, 0)),
             mode='edge'
         )

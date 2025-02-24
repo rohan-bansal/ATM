@@ -1,6 +1,6 @@
 import h5py
 
-filename_hdf = '/home/terra/dev/Research/rl2/atm/diffusion_policy/pusht_dataset/demo_10.hdf5'
+filename_hdf = '/home/terra/dev/Research/rl2/atm/diffusion_policy/pusht/demo_0.hdf5'
 
 def h5_tree(val, pre=''):
     items = len(val)
@@ -14,8 +14,8 @@ def h5_tree(val, pre=''):
             else:
                 try:
                     print(pre + '└── ' + key + ' (%d)' % len(val))
-                    if key == "waypoints_dp":
-                        print(val[:])
+                    # if key == "block_xyz_angle":
+                    #     print(val[:])
                 except TypeError:
                     print(pre + '└── ' + key + ' (scalar)')
         else:
@@ -25,8 +25,8 @@ def h5_tree(val, pre=''):
             else:
                 try:
                     print(pre + '├── ' + key + ' (%d)' % len(val))
-                    if key == "precisions":
-                        print(val[:])
+                    # if key == "actions" or key == "agent_xyz":
+                    #     print(val[:])
                 except TypeError:
                     print(pre + '├── ' + key + ' (scalar)')
 
