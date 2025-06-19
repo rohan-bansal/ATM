@@ -1,0 +1,100 @@
+defaults:
+  - _self_
+
+experiment: ??? # tag for wandb and log dir
+
+hydra:
+  run:
+    dir: ./results/policy/${now:%m%d}_${experiment}_${now:%H%M}_seed${seed}
+  sweep:
+    dir: ./results/policy/${now:%m%d}_${experiment}_${now:%H%M}_seed${seed}
+    subdir: ${hydra.job.num}
+
+wandb:
+  project: atm_policy
+  name: ${now:%m%d}_${experiment}_${now:%H%M}_seed${seed}_${hydra:job.num}
+  group: ${experiment}
+
+train_gpus: [0]
+
+# Training
+lr: 1e-4
+batch_size: 64
+mix_precision: false
+num_workers: 8
+val_freq: 25
+save_freq: 100
+clip_grad: 100.
+epochs: 501
+seed: 0
+device: cuda
+dry: false
+
+img_size: 128
+frame_stack: 2
+T_act: 8
+T_horizon: 4
+num_track_ts: 16
+num_track_ids: 32
+extra_state_keys: ["joint_states", "gripper_states"]
+
+aug_prob: 0.9
+
+train_dataset: ???
+val_dataset: ???
+val_num_demos: null
+
+env_cfg:
+  env_type: libero
+  render_gpu_ids: 0
+  vec_env_num: 10
+  horizon: 600
+  env_name: []
+  task_name: []
+  env_meta_fn: []
+
+optimizer_cfg:
+  type: optim.AdamW
+  params:
+    lr: ${lr}
+    weight_decay: 1e-6
+
+scheduler_cfg:
+  type: None
+  params:
+    T_max: ${epochs}
+    eta_min: 1e-5
+    last_epoch: -1
+
+model_name: ATMDiffusionPolicy
+model_cfg:
+  load_path: null
+  obs_cfg:
+    obs_shapes:
+      rgb: [3, 128, 128]
+      tracks: [16, 32, 2]
+    img_mean: [ 0.5, 0.5, 0.5 ]
+    img_std: [ 0.5, 0.5, 0.5 ]
+    num_views: 2
+    T_obs: ${frame_stack}
+    T_act: ${T_act}
+    horizon: ${T_horizon}
+    out_dim: 7
+    extra_states: ${extra_state_keys}
+    max_seq_len: ${frame_stack}
+    use_lang: true
+  track_cfg:
+    track_fn: ???
+    use_zero_track: false
+
+dataset_cfg:
+  img_size: ${img_size}
+  frame_stack: ${frame_stack}
+  T_act: ${T_act}
+  num_track_ts: ${num_track_ts}
+  num_track_ids: ${num_track_ids}
+  track_obs_fs: 1
+  augment_track: true
+  extra_state_keys: ${extra_state_keys}
+  cache_all: true
+  cache_image: true

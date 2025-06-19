@@ -110,6 +110,8 @@ def evaluate(fabric, cfg, checkpoint, video_save_dir, num_env_rollouts=20, rende
     optimizer = setup_optimizer(cfg.optimizer_cfg, model)
 
     model, optimizer = fabric.setup(model, optimizer)
+    if hasattr(model, "setup_ema"):
+        model.setup_ema()
 
     env_type = cfg.env_cfg.env_type
     rollout_horizon = cfg.env_cfg.get("horizon", None)
