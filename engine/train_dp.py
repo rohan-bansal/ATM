@@ -48,8 +48,6 @@ def main(cfg: DictConfig):
     model_cls = eval(cfg.model_name)
     model = model_cls(**cfg.model_cfg)
     optimizer = setup_optimizer(cfg.optimizer_cfg, model)
-    
-    train_loader = fabric.setup_dataloaders(train_loader)
 
     # from diffusion policy
     scheduler = get_scheduler(
@@ -68,6 +66,7 @@ def main(cfg: DictConfig):
 
     fabric.barrier()
     model, optimizer = fabric.setup(model, optimizer)
+    train_loader = fabric.setup_dataloaders(train_loader)
     ema = model.setup_ema()
 
     # Pick ckpt based on  the average of the last 5 epochs
